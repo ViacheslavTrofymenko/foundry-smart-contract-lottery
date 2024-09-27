@@ -38,7 +38,8 @@ contract Raffle is VRFConsumerBaseV2Plus {
      * Events
      */
     event Raffle__Entered(address indexed player);
-    event WinnerPicked(address winner);
+    event WinnerPicked(address indexed winner);
+    event RequestedRaffleWinner(uint256 indexed requestId);
 
     /**
      * Errors
@@ -130,10 +131,11 @@ contract Raffle is VRFConsumerBaseV2Plus {
             });
 
         uint256 requestId = s_vrfCoordinator.requestRandomWords(request);
+        emit RequestedRaffleWinner(requestId);
     }
 
     function fulfillRandomWords(
-        uint256 requestId,
+        uint256, /* requestId */
         uint256[] calldata randomWords
     ) internal override {
         uint256 indexOfWinner = randomWords[0] % s_players.length;
@@ -164,5 +166,13 @@ contract Raffle is VRFConsumerBaseV2Plus {
  
     function getPlayer(uint256 indexOfPlayer) external view returns(address) {
        return s_players[indexOfPlayer];
+    }
+
+    function getLastTimeStamp() external view returns (uint256) {
+        return s_lastTimeStamp;
+    }
+
+    function getRecentWinner() external view returns (address) {
+        return s_recentWinner;
     }
 }
